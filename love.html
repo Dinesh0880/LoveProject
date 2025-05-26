@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Do You Love Me? real love project</title>
+  <style>
+    #noBtn {
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+  <h2>Do You Love Me?</h2>
+  <button id="yesBtn">Yes</button>
+  <button id="noBtn">No</button>
+
+  <script type="module">
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwKBN21ZDcQeJgDUFK7_wEVFOwa_CFg64",
+      authDomain: "my-project-bbb62.firebaseapp.com",
+      databaseURL: "https://my-project-bbb62-default-rtdb.firebaseio.com",
+      projectId: "my-project-bbb62",
+      storageBucket: "my-project-bbb62.firebasestorage.app",
+      messagingSenderId: "566215784008",
+      appId: "1:566215784008:web:a4508fbf855cd13e5f0a7d",
+      measurementId: "G-2GB4W6BPRN"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+
+    yesBtn.onclick = () => {
+      push(ref(db, "responses"), {
+        ...userData,
+        response: "Yes",
+        timestamp: new Date().toISOString()
+      }).then(() => alert(" thanks dear Love you too"));
+    };
+
+    noBtn.onmouseenter = () => {
+      noBtn.style.top = Math.random() * window.innerHeight + "px";
+      noBtn.style.left = Math.random() * window.innerWidth + "px";
+    //};
+//hover pe hi response chlaa jaaye
+    //noBtn.onclick = () => {
+      push(ref(db, "responses"), {
+        ...userData,
+        response: "No",
+        timestamp: new Date().toISOString()
+      }).then(() => alert("Response saved!"));
+    };
+  //  };
+  </script>
+</body>
+</html>
