@@ -232,7 +232,7 @@
 
       set(userRef, userData).then(() => {
         localStorage.setItem("userData", JSON.stringify(userData));
-        window.location.href = `LoveProject.html?uid=${uid}`;
+        window.location.href = `love.html?uid=${uid}`;
       }).catch(err => {
         console.error(err);
         alert("Something went wrong.");
