@@ -19,6 +19,125 @@
 </body>
 </html>
 -->
+
+
+
+
+<!--
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EnterSet data</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #calculatedAge {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Enter Your Details</h2>
+  <input type="text" id="name" placeholder="Your Name" required />
+  <input type="email" id="email" placeholder="Your Email" required />
+  <input type="date" id="dob" required />
+  <div id="calculatedAge"></div>
+  <button id="nextBtn">Next</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgf2QsffVCf_4KeO9oJRGSz4Upr17mow4",
+      authDomain: "loveproject-a5515.firebaseapp.com",
+      databaseURL: "https://loveproject-a5515-default-rtdb.firebaseio.com",
+      projectId: "loveproject-a5515",
+      storageBucket: "loveproject-a5515.appspot.com",
+      messagingSenderId: "1093050880266",
+      appId: "1:1093050880266:web:aef9f5ee439fe93aa6eaf3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const dobInput = document.getElementById("dob");
+    const ageDiv = document.getElementById("calculatedAge");
+
+    dobInput.addEventListener("change", () => {
+      const dob = new Date(dobInput.value);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+      ageDiv.textContent = `Your age is: ${age} years`;
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const dob = document.getElementById('dob').value;
+
+      if (!name || !email || !dob) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      const birthDate = new Date(dob);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      const userRef = push(ref(db, 'users'));
+      const uid = userRef.key;
+
+      const userData = {
+        name,
+        email,
+        dob,
+        age,
+        createdAt: new Date().toLocaleString()
+      };
+
+      set(userRef, userData).then(() => {
+        localStorage.setItem("userData", JSON.stringify(userData));
+        window.location.href = `LoveProject.html?uid=${uid}`;
+      }).catch(err => {
+        console.error(err);
+        alert("Something went wrong.");
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+-->
+
+
+
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
