@@ -136,7 +136,7 @@
 
 
 
-
+<!--
 
 <!DOCTYPE html>
 <html>
@@ -227,6 +227,229 @@
         email,
         dob,
         age,
+        createdAt: new Date().toLocaleString()
+      };
+
+      set(userRef, userData).then(() => {
+        localStorage.setItem("userData", JSON.stringify(userData));
+        window.location.href = `love.html?uid=${uid}`;
+      }).catch(err => {
+        console.error(err);
+        alert("Something went wrong.");
+      });
+    });
+  </script>
+</body>
+</html>
+-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EnterSet data</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: auto;
+      padding: 20px;
+      background:skyblue;
+      opacity:0.9;
+    }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #calculatedAge, #otpStatus, #otpTimer {
+      font-weight: bold;
+      margin-top: 5px;
+    }
+  .a1{
+   border:2px solid black;
+    margin-top:10px;
+    margin-left:;
+    padding:40px;
+   background:rgba(255,255,255,255);
+    border-radius:20px;
+    opacity:0.7; 
+  }
+  h2{
+      margin-left:20px;
+  }
+  </style>
+</head>
+<body>
+  <div class="a1">
+  <h2>Enter Your Details</h2>
+  <input type="text" id="name" placeholder="Your Name" required />
+  <input type="email" id="email" placeholder="Your Email" required />
+  <input type="date" id="dob" required />
+  <input type="tel" id="contact" placeholder="Enter Your Contact Number" required />
+  <button id="sendOtpBtn">Send OTP</button>
+  <div id="otpTimer"></div>
+
+  <input type="tel" id="otpInput" placeholder="Enter OTP" style="display:none;" />
+  <button id="verifyOtpBtn" style="display:none;">Verify OTP</button>
+  <div id="otpStatus"></div>
+
+  <div id="calculatedAge"></div>
+  <button id="nextBtn" disabled>Next</button>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgf2QsffVCf_4KeO9oJRGSz4Upr17mow4",
+      authDomain: "loveproject-a5515.firebaseapp.com",
+      databaseURL: "https://loveproject-a5515-default-rtdb.firebaseio.com",
+      projectId: "loveproject-a5515",
+      storageBucket: "loveproject-a5515.appspot.com",
+      messagingSenderId: "1093050880266",
+      appId: "1:1093050880266:web:aef9f5ee439fe93aa6eaf3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const dobInput = document.getElementById("dob");
+    const ageDiv = document.getElementById("calculatedAge");
+    const sendOtpBtn = document.getElementById("sendOtpBtn");
+    const otpInput = document.getElementById("otpInput");
+    const otpStatus = document.getElementById("otpStatus");
+    const otpTimer = document.getElementById("otpTimer");
+    const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let generatedOTP = null;
+    let otpVerified = false;
+    let otpTimeout = null;
+
+    dobInput.addEventListener("change", () => {
+      const dob = new Date(dobInput.value);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+      ageDiv.textContent = `Your age is: ${age} years`;
+    });
+
+    sendOtpBtn.addEventListener("click", () => {
+      const contact = document.getElementById("contact").value.trim();
+
+      if (!/^\d{10}$/.test(contact)) {
+        alert("Enter correct 10-digit contact number.");
+        return;
+      }
+
+      generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+      otpInput.style.display = "block";
+      verifyOtpBtn.style.display = "inline-block";
+      otpInput.value = "";
+      otpStatus.textContent = "";
+      nextBtn.disabled = true;
+      otpVerified = false;
+
+      // Store contact number and OTP in Firebase
+      const otpRef = push(ref(db, 'otpRequests'));
+      set(otpRef, {
+        contact,
+        otp: generatedOTP,
+        createdAt: new Date().toLocaleString()
+      });
+      
+   // alert(': ${generatedOTP}');
+      alert(`OTP Sent: ${generatedOTP} (Demo purpose only)`); // In real app, send via SMS gateway
+
+      startOtpTimer();
+    });
+
+    verifyOtpBtn.addEventListener("click", () => {
+      const enteredOtp = otpInput.value.trim();
+
+      if (!enteredOtp) {
+        alert("Please enter OTP");
+        return;
+      }
+
+      if (!generatedOTP) {
+        alert("OTP expired. Please click Send OTP again.");
+        return;
+      }
+
+      if (enteredOtp === generatedOTP) {
+        otpStatus.textContent = "✅ OTP Verified";
+        otpStatus.style.color = "green";
+        otpVerified = true;
+        nextBtn.disabled = false;
+      } else {
+        otpStatus.textContent = "❌ Invalid OTP";
+        otpStatus.style.color = "red";
+        otpVerified = false;
+        nextBtn.disabled = true;
+        alert("Invalid OTP");
+      }
+    });
+
+    function startOtpTimer() {
+      let seconds = 60;
+      otpTimer.textContent = `OTP valid for: ${seconds} seconds`;
+
+      clearInterval(otpTimeout);
+      otpTimeout = setInterval(() => {
+        seconds--;
+        otpTimer.textContent = `OTP valid for: ${seconds} seconds`;
+        if (seconds <= 0) {
+          clearInterval(otpTimeout);
+          otpTimer.textContent = "OTP expired.";
+          generatedOTP = null;
+          otpVerified = false;
+          nextBtn.disabled = true;
+          alert("OTP expired. Please resend.");
+        }
+      }, 1000);
+    }
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const dob = document.getElementById('dob').value;
+      const contact = document.getElementById('contact').value.trim();
+
+      if (!name || !email || !dob || !contact) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      if (!otpVerified) {
+        alert("Please verify OTP before proceeding.");
+        return;
+      }
+
+      const birthDate = new Date(dob);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      const userRef = push(ref(db, 'users'));
+      const uid = userRef.key;
+
+      const userData = {
+        name,
+        email,
+        dob,
+        age,
+        contact,
         createdAt: new Date().toLocaleString()
       };
 
